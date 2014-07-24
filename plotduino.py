@@ -1,6 +1,24 @@
 #!/usr/bin/env python
-# main file. 
-#
+"""
+Copyright 2014 Francesco Bossu
+ciacco.posta@gmail.com
+
+Plotduino is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+Plotduino is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+--------------------
+
+"""
 import sys, glib
 from PyQt4 import QtGui, QtCore
 
@@ -52,35 +70,66 @@ class MainWin(QtGui.QMainWindow):
     #layout right:
     #------------
 
+    # prepare the buttons, the horizontal lines and the spacing
+    
     # Serial port configuration
     self.select_serial_box = QtGui.QComboBox()
     self.select_serial_box.addItems( self.data_source.si.getListOfSerialPorts() )
-    
-  
+      
     # Configuration of the output plot
     self.plotname_box = QtGui.QComboBox()
     self.plotname_box.addItems( self.plot.plotnames )
     
+    # Close button
+    self.save_button = QtGui.QPushButton("S&ave plot")
 
     # Close button
     self.close_button = QtGui.QPushButton("&Close")
     
+    # in order to fix the width of the right layout
+    # one needs to put the boxlayout in a widget
+    vboxrightWidget = QtGui.QWidget()
+    vboxright = QtGui.QVBoxLayout(vboxrightWidget)
     
-    vboxright = QtGui.QVBoxLayout()
+    # inserting the widgets in the layout
+    
+    # serial configuration
+    label = QtGui.QLabel("Serial configuration")
+    vboxright.addWidget(label)
     vboxright.addWidget(self.select_serial_box)
+    
+    # horizontal line
+    line = QtGui.QFrame(self)
+    line.setFrameShape(QtGui.QFrame.HLine)
+    line.setFrameShadow(QtGui.QFrame.Sunken)
+    vboxright.addWidget(line)
+    
+    # plot type
+    label = QtGui.QLabel("Plot type")
+    vboxright.addWidget(label)
     vboxright.addWidget(self.plotname_box)
     
+    # vertical space
     vboxright.addItem(QtGui.QSpacerItem(20,40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
     
+    # buttons
+    vboxright.addWidget(self.save_button)
     vboxright.addWidget(self.close_button)
+    
+    #fix the width of the right layout through its enclosing widget
+    vboxright.setContentsMargins(0,0,0,0)
+    vboxrightWidget.setFixedWidth(150)
+    
     
     
     # Global horizontal layout: takes the two vertial box layouts
+    #-------------------------------------------------------------
     hboxmain = QtGui.QHBoxLayout()
     hboxmain.addLayout(vboxleft)
-    hboxmain.addLayout(vboxright)
+    hboxmain.addWidget(vboxrightWidget)
     
     # setting the global horizontal box as the main_frame layout
+    #-----------------------------------------------------------
     self.main_frame.setLayout( hboxmain )
     self.setCentralWidget( self.main_frame )
     
@@ -90,6 +139,7 @@ class MainWin(QtGui.QMainWindow):
     self.connect(self.play_button, QtCore.SIGNAL('clicked()'), self.play)
     self.connect(self.stop_button, QtCore.SIGNAL('clicked()'), self.stop)
     self.connect(self.close_button, QtCore.SIGNAL('clicked()'), self.close)
+    self.connect(self.save_button, QtCore.SIGNAL('clicked()'), self.plot.saveplot)
     self.connect(self.timer, QtCore.SIGNAL('timeout()'), self.draw)
     
 

@@ -1,0 +1,8 @@
+Plotduino
+
+reads values from Arduino using the serial port and plots them
+
+To run it, it needs
+pySerial
+PyQt
+matplotlib

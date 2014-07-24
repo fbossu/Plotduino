@@ -5,8 +5,9 @@ import time
 from threading import Thread
 
 """
-Thanks to:
-Snap of code taken from Arduino_Monitor
+Thanks to: gregpinero
+Snap of code taken from ArduinoPlot:
+https://github.com/gregpinero/ArduinoPlot
 """
 stopthread = False
 last_received = ''
