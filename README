@@ -6,3 +6,41 @@ To run it, it needs
 pySerial
 PyQt
 matplotlib
+
+
+------------
+this is a snippet of code for the Arduino used for testing
+Please note the ',' separator between the two values, used in "Plotduino" to separate them.
+
+---------------
+const int aSensor0 = A0;
+const int aSensor1 = A1;
+
+int anValue0 = 0, anValue1 = 0;
+
+void setup() {
+ Serial.begin(9600);       // use the serial port
+ while(1){  // wait for somebody to write someting before starting the loop
+   delay(200);
+   if( Serial.available() > 0 ){
+     Serial.read();
+     break;
+   }
+ }
+}
+
+
+void loop(){
+
+  anValue0 = analogRead( aSensor0 );
+  anValue1 = analogRead( aSensor1 );
+
+  Serial.print(anValue0);
+  Serial.print(',');
+  Serial.println( anValue1);
+      
+  delay(200);
+}
+
+
+

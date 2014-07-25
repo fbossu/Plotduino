@@ -34,6 +34,9 @@ class MainWin(QtGui.QMainWindow):
     self.data_source = data.data()
     self.data_source.selection = 0
     
+    # time interval for the plot update
+    self.timestep = 200
+    
     # timer for updating the plot
     self.timer = QtCore.QTimer(self)
 
@@ -80,6 +83,14 @@ class MainWin(QtGui.QMainWindow):
     self.plotname_box = QtGui.QComboBox()
     self.plotname_box.addItems( self.plot.plotnames )
     
+    # select the time interval to update the plot
+    labelspinbox = QtGui.QLabel("Update (ms):")
+    self.spinbox_timestep = QtGui.QSpinBox()
+    self.spinbox_timestep.setRange(100,2000) #from 0.1 to 5 seconds
+    self.spinbox_timestep.setSingleStep(50)
+    self.spinbox_timestep.setValue( self.timestep)
+    labelspinbox.setBuddy(self.spinbox_timestep )
+    
     # Close button
     self.save_button = QtGui.QPushButton("S&ave plot")
 
@@ -109,6 +120,12 @@ class MainWin(QtGui.QMainWindow):
     vboxright.addWidget(label)
     vboxright.addWidget(self.plotname_box)
     
+    # plot interval
+    hbox_spinbox = QtGui.QHBoxLayout()
+    hbox_spinbox.addWidget(labelspinbox)
+    hbox_spinbox.addWidget(self.spinbox_timestep)
+    vboxright.addLayout(hbox_spinbox)
+    
     # vertical space
     vboxright.addItem(QtGui.QSpacerItem(20,40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
     
@@ -122,7 +139,7 @@ class MainWin(QtGui.QMainWindow):
     
     
     
-    # Global horizontal layout: takes the two vertial box layouts
+    # Global horizontal layout: takes the two vertical box layouts
     #-------------------------------------------------------------
     hboxmain = QtGui.QHBoxLayout()
     hboxmain.addLayout(vboxleft)
@@ -147,19 +164,36 @@ class MainWin(QtGui.QMainWindow):
     self.data_source.setPortName(self.select_serial_box.currentText())
 
   def play(self):
+    """ This function is activated with the Play button. """
+    # set the type of plot
     self.plot.plotkind = self.plotname_box.currentText()
+    
+    #connect the mtp interface to the data source
     self.plot.importdata( self.data_source )
+
+    # start the serial communication
     self.start_serial()
-    self.timer.start(200)
+    
+    # get and set the time interval for updating the plot
+    self.timestep = self.spinbox_timestep.value()
+    
+    #start the timer
+    self.timer.start(self.timestep)
+    
+    #disable the various buttons
     self.play_button.setDown(True)
     self.play_button.setEnabled(False)
     self.stop_button.setEnabled(True)
     self.select_serial_box.setEnabled(False)
     self.plotname_box.setEnabled(False)
      
+     
   def stop( self ):
+    """ This function stop the acquisition and the update of the plot"""
     self.data_source.si.daqStop()
     self.timer.stop()
+    
+    #re-enable the play button
     self.play_button.setEnabled(True)
     self.stop_button.setEnabled(False)
     
