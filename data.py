@@ -58,7 +58,7 @@ class data():
     if self.si.port_name == "Test":
       for iv in range(0,N):
         valnum.append( random.random() )
-    elif len(valstr) != N:
+    elif len(valstr) < N:
       for iv in range(0,N):
         valnum.append( 0 )
     else:

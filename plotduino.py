@@ -91,9 +91,19 @@ class MainWin(QtGui.QMainWindow):
     self.spinbox_timestep.setValue( self.timestep)
     labelspinbox.setBuddy(self.spinbox_timestep )
     
-    # Close button
+    # show last N data points
+    self.showlastsCheckBox = QtGui.QCheckBox("Show last:")
+    self.spinbox_showlast= QtGui.QSpinBox()
+    self.spinbox_showlast.setRange(10,1000) #from 0.1 to 5 seconds
+    self.spinbox_showlast.setValue( 50)
+    
+    
+    # Save plot button
     self.save_button = QtGui.QPushButton("S&ave plot")
 
+    # Reset data button
+    self.resetdata_button = QtGui.QPushButton("&Reset data")
+    
     # Close button
     self.close_button = QtGui.QPushButton("&Close")
     
@@ -126,17 +136,29 @@ class MainWin(QtGui.QMainWindow):
     hbox_spinbox.addWidget(self.spinbox_timestep)
     vboxright.addLayout(hbox_spinbox)
     
+    # horizontal line
+    line = QtGui.QFrame(self)
+    line.setFrameShape(QtGui.QFrame.HLine)
+    line.setFrameShadow(QtGui.QFrame.Sunken)
+    vboxright.addWidget(line)
+    
+    # Plot confifuration
+    hboxshowlast = QtGui.QHBoxLayout()
+    hboxshowlast.addWidget( self.showlastsCheckBox )
+    hboxshowlast.addWidget( self.spinbox_showlast )
+    vboxright.addLayout( hboxshowlast )
+    
     # vertical space
     vboxright.addItem(QtGui.QSpacerItem(20,40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding))
     
     # buttons
     vboxright.addWidget(self.save_button)
+    vboxright.addWidget(self.resetdata_button)
     vboxright.addWidget(self.close_button)
     
     #fix the width of the right layout through its enclosing widget
     vboxright.setContentsMargins(0,0,0,0)
     vboxrightWidget.setFixedWidth(150)
-    
     
     
     # Global horizontal layout: takes the two vertical box layouts
@@ -157,6 +179,8 @@ class MainWin(QtGui.QMainWindow):
     self.connect(self.stop_button, QtCore.SIGNAL('clicked()'), self.stop)
     self.connect(self.close_button, QtCore.SIGNAL('clicked()'), self.close)
     self.connect(self.save_button, QtCore.SIGNAL('clicked()'), self.plot.saveplot)
+    self.connect(self.resetdata_button, QtCore.SIGNAL('clicked()'), self.plot.reset)
+    self.connect(self.showlastsCheckBox, QtCore.SIGNAL('clicked()'), self.showlasts)
     self.connect(self.timer, QtCore.SIGNAL('timeout()'), self.draw)
     
 
@@ -186,7 +210,7 @@ class MainWin(QtGui.QMainWindow):
     self.stop_button.setEnabled(True)
     self.select_serial_box.setEnabled(False)
     self.plotname_box.setEnabled(False)
-     
+    self.spinbox_timestep.setEnabled(False)
      
   def stop( self ):
     """ This function stop the acquisition and the update of the plot"""
@@ -196,9 +220,21 @@ class MainWin(QtGui.QMainWindow):
     #re-enable the play button
     self.play_button.setEnabled(True)
     self.stop_button.setEnabled(False)
+    self.spinbox_timestep.setEnabled(True)
     
   def draw(self):
     self.plot.updateplot()
+    
+  def showlasts( self ):
+    if self.showlastsCheckBox.isChecked():
+      self.spinbox_showlast.setEnabled( False )
+      self.plot.showlastN = self.spinbox_showlast.value()
+      self.plot.showlasts = True
+      
+    else:
+      self.spinbox_showlast.setEnabled( True )
+      self.plot.showlasts = False
+      
     
   def __del__(self):
     del self.data_source

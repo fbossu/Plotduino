@@ -20,6 +20,9 @@ class mtp():
     self.y1 = []
     self.t = 0
     
+    self.showlasts = False
+    self.showlastN = 50
+    
   def importdata(self, data ):
     self.datasource = data
     
@@ -32,26 +35,54 @@ class mtp():
       """ Single Value plot as a function of the reading"""
       self.single()
       self.axes.clear()
-      self.axes.plot( self.x, self.y, 'o-' )
+      self.axes.plot( self.x, self.y, '-' )
 
+      self.axes.set_xbound( upper=self.x[-1]+2 )
+      if self.showlasts and len(self.x) > (self.showlastN+1):
+        self.axes.set_xbound( self.x[-self.showlastN] )
+        
     elif self.plotkind == self.plotnames[1]:
       """ Two Values plot as a function of the reading"""
       self.two()
       self.axes.clear()
+      
       self.axes.plot( self.x, self.y, 'o-' )
       self.axes.plot( self.x, self.y1, 'o-' )
+      
+      self.axes.set_xbound( upper=self.x[-1]+2 )
+      if self.showlasts and len(self.x) > (self.showlastN+1):
+        self.axes.set_xbound( self.x[-self.showlastN] )
 
     elif self.plotkind == self.plotnames[2]:
       """ Two values scatter plot"""
       self.scatter()
-      #self.reset()
       self.axes.clear()
-      self.axes.scatter( self.x, self.y )
+      xx = []
+      yy= []
+      if self.showlasts and len(self.x) > (self.showlastN+1):
+        n = len(self.x)
+        l = self.showlastN
+        xx = self.x[ n-l-1:n-1]
+        yy = self.y[ n-l-1:n-1]
+      else:
+        xx = self.x
+        yy = self.y
+
+      self.axes.scatter( xx, yy )
       
     elif self.plotkind == self.plotnames[3]:
+      """ Histogram """
       self.single()
       self.axes.clear()
-      self.axes.hist( self.y, bins=50 )
+      yy= []
+      if self.showlasts and len(self.y) > (self.showlastN+1):
+        n = len(self.y)
+        l = self.showlastN
+        yy = self.y[ n-l-1:n-1]
+      else:
+        yy = self.y
+
+      self.axes.hist( yy, bins=50 )
     else:
       print "Bad selection"
     
@@ -81,12 +112,12 @@ class mtp():
   def saveplot(self, name=None):
       if not name:
         ymdhms = datetime.now()
-        name = "plotduino_%d-%d-%d_%d%d%d.png" % (ymdhms.year, 
-                                                  ymdhms.month, 
-                                                  ymdhms.day, 
-                                                  ymdhms.hour,
-                                                  ymdhms.minute, 
-                                                  ymdhms.second )
+        name = "plotduino_%d-%d-%d_%d%d%d.png" % ( ymdhms.year, 
+                                                   ymdhms.month, 
+                                                   ymdhms.day, 
+                                                   ymdhms.hour,
+                                                   ymdhms.minute, 
+                                                   ymdhms.second )
       
       print "saving plot...", name
       try:
@@ -97,4 +128,5 @@ class mtp():
   def reset( self ):
     self.x = []
     self.y = []
+    self.y1 = []
     self.t = 0
