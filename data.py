@@ -1,6 +1,7 @@
 import random
 import glob
 import serial
+from serial.tools.list_ports import *
 import time
 from threading import Thread
 
@@ -85,11 +86,12 @@ class serialInterface():
     self.names = self.getListOfSerialPorts()
     self.port_name = 'Test'
     self.bitrate = 9600
+    self.bitrates = ['4800', '9600', '14400', '28800', '57600', '115200' ]
     self.request_char = ''
     self.datataking = False
      
   def openserial(self):
-    print "opening serial communication..."
+    print "opening serial communication...", unicode(self.port_name), self.bitrate
     try:
       print self.port_name
       self.ser = serial.Serial(
@@ -128,9 +130,11 @@ class serialInterface():
     #self.datataking = False
     
   def getListOfSerialPorts( self ):
-    # works on linux
-    return ['Test'] + glob.glob('/dev/ttyUSB*') + glob.glob('/dev/ttyACM*')
-  
+    l = comports()  # from serial.tools
+    s = []
+    for i,j in enumerate(l): s.append( l[i][0] )
+    return s
+    
   def __del__(self):
     try:
       self.daqStop()
