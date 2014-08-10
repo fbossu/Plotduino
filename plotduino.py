@@ -78,7 +78,11 @@ class MainWin(QtGui.QMainWindow):
     # Serial port configuration
     self.select_serial_box = QtGui.QComboBox()
     self.select_serial_box.addItems( self.data_source.si.getListOfSerialPorts() )
-      
+ 
+    self.select_speed_box = QtGui.QComboBox()
+    self.select_speed_box.addItems( self.data_source.si.bitrates )
+    self.select_speed_box.setCurrentIndex( 1 )
+ 
     # Configuration of the output plot
     self.plotname_box = QtGui.QComboBox()
     self.plotname_box.addItems( self.plot.plotnames )
@@ -117,7 +121,18 @@ class MainWin(QtGui.QMainWindow):
     # serial configuration
     label = QtGui.QLabel("Serial configuration")
     vboxright.addWidget(label)
-    vboxright.addWidget(self.select_serial_box)
+    
+    hbox = QtGui.QHBoxLayout()
+    label = QtGui.QLabel("Port:")
+    hbox.addWidget( label )
+    hbox.addWidget( self.select_serial_box)
+    vboxright.addLayout( hbox )
+    
+    hbox = QtGui.QHBoxLayout()
+    label = QtGui.QLabel("Bitrate:")
+    hbox.addWidget( label )
+    hbox.addWidget( self.select_speed_box)
+    vboxright.addLayout( hbox )
     
     # horizontal line
     line = QtGui.QFrame(self)
@@ -158,7 +173,7 @@ class MainWin(QtGui.QMainWindow):
     
     #fix the width of the right layout through its enclosing widget
     vboxright.setContentsMargins(0,0,0,0)
-    vboxrightWidget.setFixedWidth(150)
+    vboxrightWidget.setFixedWidth(180)
     
     
     # Global horizontal layout: takes the two vertical box layouts
@@ -186,6 +201,7 @@ class MainWin(QtGui.QMainWindow):
 
   def start_serial( self ):
     self.data_source.setPortName(self.select_serial_box.currentText())
+    self.data_source.bitrate = int(self.select_speed_box.currentText())
 
   def play(self):
     """ This function is activated with the Play button. """
@@ -209,6 +225,7 @@ class MainWin(QtGui.QMainWindow):
     self.play_button.setEnabled(False)
     self.stop_button.setEnabled(True)
     self.select_serial_box.setEnabled(False)
+    self.select_speed_box.setEnabled(False)
     self.plotname_box.setEnabled(False)
     self.spinbox_timestep.setEnabled(False)
      
