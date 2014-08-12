@@ -50,7 +50,8 @@ class data():
   def getdata(self, N ):  
     valstr = last_received.split(',')
     valnum = []
-    if not self.si.datataking:
+    
+    if self.si.port_name != "Test" and not self.si.datataking :
       self.si.openserial()
 
     if not self.si.datataking and self.si.port_name != "Test":
