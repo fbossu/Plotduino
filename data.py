@@ -46,15 +46,16 @@ class data():
 
   def setPortName(self, name):
     self.si.port_name = name
-    if name != "Test":
-      if not self.si.datataking:
-        self.si.openserial()
-        time.sleep(0.5)
-        self.si.daqStart()
     
   def getdata(self, N ):  
     valstr = last_received.split(',')
     valnum = []
+    if not self.si.datataking:
+      self.si.openserial()
+
+    if not self.si.datataking and self.si.port_name != "Test":
+        time.sleep(0.5)
+        self.si.daqStart()
     
     if self.si.port_name == "Test":
       for iv in range(0,N):
@@ -62,6 +63,8 @@ class data():
     elif len(valstr) < N:
       for iv in range(0,N):
         valnum.append( 0 )
+        print "*** WARNING ***, the received string contains less fields than requested"
+        
     else:
       for iv in range(0,N):
         tmpv = 0
@@ -71,6 +74,7 @@ class data():
           print "*** WARNING ***, corrupted data ", valstr[iv]
         valnum.append( tmpv  )
         
+    self.si.datataking = True
     return valnum
   
   def __del__(self):
@@ -83,8 +87,8 @@ Interface to the arduino
 ==================================="""  
 class serialInterface():
   def __init__(self):
-    self.names = self.getListOfSerialPorts()
     self.port_name = 'Test'
+    self.names = self.getListOfSerialPorts()
     self.bitrate = 9600
     self.bitrates = ['4800', '9600', '14400', '28800', '57600', '115200' ]
     self.request_char = ''
@@ -93,7 +97,6 @@ class serialInterface():
   def openserial(self):
     print "opening serial communication...", unicode(self.port_name), self.bitrate
     try:
-      print self.port_name
       self.ser = serial.Serial(
                 port=unicode(self.port_name),
                 baudrate=self.bitrate,
@@ -131,7 +134,7 @@ class serialInterface():
     
   def getListOfSerialPorts( self ):
     l = comports()  # from serial.tools
-    s = []
+    s = [ self.port_name ]
     for i,j in enumerate(l): s.append( l[i][0] )
     return s
     

@@ -211,8 +211,9 @@ class MainWin(QtGui.QMainWindow):
     #connect the mtp interface to the data source
     self.plot.importdata( self.data_source )
 
-    # start the serial communication
-    self.start_serial()
+    # start the serial communication only the first time
+    if self.select_serial_box.isEnabled():
+      self.start_serial()
     
     # get and set the time interval for updating the plot
     self.timestep = self.spinbox_timestep.value()
