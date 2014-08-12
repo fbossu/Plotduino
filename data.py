@@ -129,13 +129,12 @@ class serialInterface():
   def daqStop(self):
     global stopthread
     stopthread = True
-    #Thread(target=receiving, args=(self.ser,)).stop()
-    #self.datataking = False
     
   def getListOfSerialPorts( self ):
-    l = comports()  # from serial.tools
+    l = sorted(comports())  # from serial.tools
     s = [ self.port_name ]
-    for i,j in enumerate(l): s.append( l[i][0] )
+    for i in l: s.append( i[0] )
+    
     return s
     
   def __del__(self):

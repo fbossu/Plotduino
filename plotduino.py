@@ -19,7 +19,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 --------------------
 
 """
-import sys, glib
+import sys
 from PyQt4 import QtGui, QtCore
 
 #import my libraries
